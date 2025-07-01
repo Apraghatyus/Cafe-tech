@@ -1,0 +1,93 @@
+# Technician Backend
+
+Este proyecto es una API backend para la gestión de productos y pedidos, utilizando Python, FastAPI y PostgreSQL. El backend está preparado para ejecutarse en contenedores Docker y se conecta a una base de datos PostgreSQL.
+
+## Estructura del Proyecto
+
+```
+backend/
+  dockerfile
+  root/
+    app.py
+    config.py
+    requirements.txt
+    controllers/
+    models/
+    repositories/
+    schemas/
+    services/
+    utils/
+frontend/
+  dockerfile
+docker-compose.yml
+```
+
+- **controllers/**: Controladores para manejar las rutas y lógica de negocio.
+- **models/**: Modelos de datos (ORM).
+- **repositories/**: Acceso y gestión de datos en la base de datos.
+- **schemas/**: Esquemas de validación y serialización de datos.
+- **services/**: Lógica de negocio.
+- **utils/**: Utilidades y helpers (JWT, respuestas API, conexión DB, etc).
+
+## Tecnologías
+
+- Python 3.x
+- FastAPI
+- PostgreSQL
+- Docker & Docker Compose
+- Gunicorn
+
+## Instalación y Ejecución
+
+1. **Clonar el repositorio**
+   ```sh
+   git clone <url-del-repo>
+   cd technician-backend
+   ```
+
+2. **Configura las variables de entorno**  
+   Las variables principales ya están definidas en `docker-compose.yml`.
+
+3. **Construir y levantar los contenedores**
+   ```sh
+   docker-compose up --build
+   ```
+
+   Esto levantará dos servicios:
+   - `db`: Base de datos PostgreSQL.
+   - `backend`: API backend en FastAPI/Gunicorn.
+
+4. **Acceso**
+   - API: [http://localhost:9000](http://localhost:9000)
+   - Documentación Swagger: [http://localhost:9000/docs](http://localhost:9000/docs)
+
+## Comandos útiles
+
+- **Parar los contenedores**
+  ```sh
+  docker-compose down
+  ```
+
+- **Ver logs**
+  ```sh
+  docker-compose logs -f
+  ```
+
+## Estructura de carpetas principal
+
+- `controllers/`: Endpoints de autenticación, productos y pedidos.
+- `models/`: Modelos de usuario, producto y pedido.
+- `repositories/`: Acceso a datos.
+- `schemas/`: Validaciones de entrada/salida.
+- `services/`: Lógica de negocio.
+- `utils/`: JWT, respuestas, conexión a base de datos.
+
+## Notas
+
+- El backend está montado en `/workspace` dentro del contenedor.
+- El servicio de base de datos persiste los datos en el volumen `pedidos_data`.
+- El archivo `requirements.txt` debe contener todas las dependencias de Python necesarias.
+
+---
+
+> Si tienes dudas, revisa los archivos de configuración o contacta al responsable del proyecto.

@@ -1,0 +1,62 @@
+# docker-compose.yml
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15
+    container_name: technician-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: toor
+      POSTGRES_DB: technicial_test
+    ports:
+      - "5432:5432"
+    volumes:
+      - pedidos_data:/var/lib/postgresql/data
+    networks:
+      - technician-net
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: technician-backend
+    image: technician-backend:latest
+    
+    # Comando temporal para debugging
+    command: ["gunicorn", "app:create_app()", "--bind", "0.0.0.0:9000"]  # Mantiene el contenedor corriendo por 1 hora
+    
+    volumes:
+      - ./backend/root:/workspace  # Monta la carpeta root en /workspace
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://root:toor@db:5432/technicial_test
+      PYTHONPATH: /workspace
+    ports:
+      - "9000:9000"
+    networks:
+      - technician-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: technician-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      VUE_APP_API_URL: "http://localhost:9000/api/v1"
+    ports:
+      - "8080:8080"  # Cambiar de 8080:80 a 8080:8080 para desarrollo
+    networks:
+      - technician-net
+
+volumes:
+  pedidos_data:
+
+networks:
+  technician-net:
+    driver: bridge

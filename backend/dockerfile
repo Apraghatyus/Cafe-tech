@@ -1,0 +1,44 @@
+# Dockerfile para entorno de desarrollo con VSCode y Flask
+
+# Usar imagen base de Python 3.11 slim
+FROM python:3.11-slim
+
+# Directorio de trabajo dentro del contenedor
+WORKDIR /workspace
+
+# Ajustar repositorios a Debian Bookworm e instalar Git, compilador y librerías de PostgreSQL
+RUN rm -f /etc/apt/sources.list.d/debian.sources \
+    && echo "deb https://deb.debian.org/debian bookworm main" > /etc/apt/sources.list \
+    && echo "deb https://deb.debian.org/debian bookworm-updates main" >> /etc/apt/sources.list \
+    && echo "deb https://security.debian.org/debian-security bookworm-security main" >> /etc/apt/sources.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+         git \
+         build-essential \
+         libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copiar y poner en cola las dependencias
+COPY root/requirements.txt .
+
+# Instalar dependencias de Python
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Crear grupo y usuario con UID/GID 1000 para que coincida con el host
+RUN groupadd -g 1000 jcardonar \
+    && useradd -m -u 1000 -g 1000 -s /bin/bash jcardonar
+
+# Copiar todo el código de la aplicación
+COPY root/ .
+
+# Ajustar permisos del workspace
+RUN chown -R jcardonar:jcardonar /workspace
+
+# Cambiar al usuario no-root
+USER jcardonar
+
+# Puerto por defecto de Flask
+EXPOSE 5000
+
+# Comando por defecto para arrancar tu entorno de desarrollo
+CMD ["python", "-c", "print('Contenedor listo. Ejecuta tu aplicación Flask aquí, por ejemplo: flask run --host=0.0.0.0')"]

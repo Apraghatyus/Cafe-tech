@@ -1,0 +1,33 @@
+# Dockerfile para entorno de desarrollo con Vue.js
+
+FROM node:18-alpine
+
+# Directorio de trabajo
+WORKDIR /app
+
+# Instalar Vue CLI globalmente
+RUN npm install -g @vue/cli
+
+# Crear un proyecto Vue básico si no existe
+RUN if [ ! -f package.json ]; then \
+    echo '{"name": "technician-frontend", "version": "1.0.0", "scripts": {"serve": "vue-cli-service serve --host 0.0.0.0 --port 8080", "build": "vue-cli-service build"}, "dependencies": {"vue": "^3.3.4", "axios": "^1.4.0"}, "devDependencies": {"@vue/cli-service": "^5.0.8", "@vue/compiler-sfc": "^3.3.4"}}' > package.json; \
+    fi
+
+# Copiar archivos del proyecto (si existen)
+COPY . .
+
+# Instalar dependencias
+RUN npm install
+
+# Crear usuario jcardonar y ajustar permisos
+RUN adduser -D -s /bin/bash jcardonar \
+    && chown -R jcardonar:jcardonar /app
+
+# Cambiar al usuario no-root
+USER jcardonar
+
+# Exponer puerto
+EXPOSE 8080
+
+# Comando para desarrollo
+CMD ["npm", "run", "serve"]
